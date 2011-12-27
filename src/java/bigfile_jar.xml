@@ -1,0 +1,18 @@
+<project default="bigFile">
+
+  <target name="compile">
+    <mkdir dir="classes"/>
+    <javac srcdir="." destdir="classes" includes="us/mn/state/dot/mnroad/BigFile.java"/>
+  </target>
+  
+  <target name="jar" depends="compile">
+    <jar destfile="../../target/bigfile.jar"
+         basedir="classes"
+         includes="**/*.class"
+         />
+    <delete dir="classes"/>
+  </target>
+  
+  <target name="bigFile" depends="compile,jar" />
+
+</project>

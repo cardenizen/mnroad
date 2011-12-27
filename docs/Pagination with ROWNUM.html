@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Pagination with ROWNUM</title>
+</head>
+<body>
+<p>
+<span class="parahead1">Pagination with ROWNUM</span>
+</p>
+
+<p>
+<span class="bodycopy">My all-time-favorite use of ROWNUM is pagination.
+ In this case, I use ROWNUM to get rows </span><span class="italicbodycopy">N</span><span class="bodycopy"> through M of a 
+result set. The general form is as follows: </span>
+</p>
+
+<p>
+</p>
+<pre>select * <br>  from ( select /*+ FIRST_ROWS(n) */ <br>  a.*, ROWNUM rnum <br>      from ( your_query_goes_here, <br>      with order by ) a <br>      where ROWNUM &lt;= <br>      :MAX_ROW_TO_FETCH ) <br>where rnum  &gt;= :MIN_ROW_TO_FETCH;<br><br>where<br></pre>
+
+<p></p>
+
+<p>
+</p>
+<ul>
+  <li><span class="bodycopy">  FIRST_ROWS(N) tells the optimizer, "Hey, 
+I'm interested in getting the first rows, and I'll get </span><span class="italicbodycopy">N</span><span class="bodycopy"> of them as fast 
+as possible." </span></li>
+  <li><span class="bodycopy">  :MAX_ROW_TO_FETCH is set to the last row of
+ the result set to fetch&mdash;if you wanted rows 50 to 60 of the result set, 
+you would set this to 60.</span></li>
+  <li><span class="bodycopy">  :MIN_ROW_TO_FETCH is set to the first row 
+of the result set to fetch, so to get rows 50 to 60, you would set this 
+to 50.</span></li>
+</ul>
+
+<p></p>
+
+<p>
+<span class="bodycopy">The concept behind this scenario is that an end 
+user with a Web browser has done a search and is waiting for the 
+results. It is imperative to return the first result page (and second 
+page, and so on) as fast as possible. If you look at that query closely,
+ you'll notice that it incorporates a top-</span><span class="italicbodycopy">N</span><span class="bodycopy"> query (get the 
+first :MAX_ROW_TO_FETCH rows from your query) and hence benefits from 
+the top-</span><span class="italicbodycopy">N</span><span class="bodycopy"> query optimization I just described. Further, it 
+returns over the network to the client only the specific rows of 
+interest&mdash;it removes any leading rows from the result set that are not of
+ interest.</span>
+</p>
+
+<p>
+<span class="bodycopy">One important thing about using this pagination 
+query is that the ORDER BY statement should order by something unique. 
+If what you are ordering by is not unique, you should add something to 
+the end of the ORDER BY to make it so. If you sort 100 records by 
+SALARY, for example, and they all have the same SALARY value, then 
+specifying rows 20 to 25 does not really have any meaning. In order to 
+see this, use a small table with lots of duplicated ID values:</span>
+</p>
+
+<p>
+</p>
+<pre>SQL&gt; create table t<br>  2  as<br>  3  select mod(level,5) id, <br>     trunc(dbms_random.value(1,100)) data <br>  4    from dual<br>  5  connect by level &lt;= 10000;<br>Table created.<br></pre>
+
+<p></p>
+
+<p>
+<span class="bodycopy">And then query rows 148 to 150 and 151 after 
+sorting by the ID column:</span>
+</p>
+
+<p>
+</p>
+<pre>SQL&gt; select *<br>  2    from<br>  3  (select a.*, rownum rnum<br>  4     from<br>  5  (select id, data<br>  6     from t<br>  7   order by id) a<br>  8   where rownum &lt;= 150<br>  9  )<br> 10   where rnum &gt;= 148;<br><br> ID           DATA           RNUM<br>-------       ----------     -----------<br>0             38             148<br>0             64             149<br>0             53             150<br><br>SQL&gt;<br>SQL&gt; select *<br>  2    from<br>  3  (select a.*, rownum rnum<br>  4     from<br>  5  (select id, data<br>  6     from t<br>  7   order by id) a<br>  8   where rownum &lt;= 151<br>  9  )<br> 10   where rnum &gt;= 148;<br><br> ID           DATA           RNUM<br>-------       ----------     -----------<br>0             59             148<br>0             38             149<br>0             64             150<br>0             53             151<br></pre>
+
+<p></p>
+
+<p>
+<span class="bodycopy">Note in this case that one time for row 148, the 
+result returned DATA=38, and that the next time, the result returned 
+DATA=59. Both queries are returning exactly the right answer, given what
+ you've requested: Sort the data by ID, throw out the first 147 rows, 
+and return the next 3 or 4 rows. Both of them do that, but because ID 
+has so many duplicate values, the query cannot do it deterministically&mdash;</span><span class="italicbodycopy">the same sort order is not assured from run to 
+run of the query</span><span class="bodycopy">. In order to correct 
+this, you need to add something unique to the ORDER BY. In this case, 
+just use ROWID:</span>
+</p>
+
+<p>
+</p>
+<pre>SQL&gt; select *<br>  2    from<br>  3  (select a.*, rownum rnum<br>  4     from<br>  5  (select id, data<br>  6     from t<br>  7   order by id, rowid) a<br>  8   where rownum &lt;= 150<br>  9  )<br> 10   where rnum &gt;= 148;<br><br> ID           DATA           RNUM<br>-------       ----------     -----------<br>0             45             148<br>0             99             149<br>0             41             150<br><br>SQL&gt;<br>SQL&gt; select *<br>  2    from<br>  3  (select a.*, rownum rnum<br>  4     from<br>  5  (select id, data<br>  6     from t<br>  7   order by id, rowid) a<br>  8   where rownum &lt;= 151<br>  9  )<br> 10   where rnum &gt;= 148;<br><br> ID           DATA           RNUM<br>-------       ----------     -----------<br>0             45             148<br>0             99             149<br>0             41             150<br>0             45             151<br></pre>
+
+<p></p>
+
+
+<span class="bodycopy">Now the query is very deterministic. ROWID is 
+unique within a table, so if you use ORDER BY ID and then within ID you 
+use ORDER BY ROWID, the rows will have a definite, deterministic order 
+and the pagination query will deterministically return the rows as 
+expected.</span>
+</body>
+</html>

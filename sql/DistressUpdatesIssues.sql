@@ -1,0 +1,99 @@
+More Data Cleanup
+
+Sad to say, but more data cleanup needs to be done.  The issue accidentally uncovered while checking some updates Tim had requested occurs when data, linked via natural key using the wrong data is collected.  The specific case is 1500+ observations of DISTRESS_OBSI_DATA data collected for cells 5,6,13,14,25,26 between 6/13/2008 and 11/17/2009.  The 2008 construction demolished cells 6,13,25, and 26. These were replaced by cells 106,206,113,213,313,413,85,86,87,88,89.  The construction morphed cells 5 and 14 into cells 105,205,305,405,114,214,314,414,514,614,714,814,914. 
+
+
+-- Rows in DISTRESS_* table 
+-- linked via DISTRESS_*.ID=DISTRESS.ID 
+-- not in DISTRESS
+-- Natural Key is CELL, LANE, DAY, TIME, TRIAL, FREQ_HZ
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.TRIAL,DV.FREQ_HZ
+FROM MNR.DISTRESS_OBSI_DATA DV 
+MINUS 
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.TRIAL,DV.FREQ_HZ
+FROM MNR.DISTRESS_OBSI_DATA DV JOIN MNR.DISTRESS D ON DV.ID=D.ID
+ORDER BY CELL,LANE,DAY,TIME,FREQ_HZ;
+
+-- Rows in DISTRESS_* table 
+-- linked via DISTRESS_*.CELL=CELLS.CELL AND DISTRESS_*.LANE=CELLS.LANE AND CELLS.FROM_DATE<=DISTRESS_*.DAY<=CELLS.TO_DATE
+-- not in DISTRESS
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.TRIAL,DV.FREQ_HZ
+FROM MNR.CELLS C JOIN MNR.LANE L ON L.CELL_ID=C.ID
+JOIN MNR.DISTRESS_OBSI_DATA DV ON DV.CELL=C.CELL AND DV.LANE=L.NAME AND DV.DAY BETWEEN C.FROM_DATE AND C.TO_DATE
+MINUS
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.TRIAL,DV.FREQ_HZ
+FROM MNR.CELLS C JOIN LANE L ON L.CELL_ID=C.ID
+JOIN MNR.DISTRESS_OBSI_DATA DV ON DV.CELL=C.CELL AND DV.LANE=L.NAME AND DV.DAY BETWEEN C.FROM_DATE AND C.TO_DATE
+JOIN MNR.DISTRESS D ON D.ID=DV.ID
+ORDER BY CELL,LANE,DAY,TIME,FREQ_HZ;
+
+-- Difference
+SELECT CELL,LANE,TO_CHAR(DAY,'yyyy-mm-dd') DAY,TIME,TRIAL,FREQ_HZ FROM (
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.FREQ_HZ,DV.ID,DV.OPERATOR,DV.TEST_TIRE,DV.LEADING_INTENSITY_LEVEL,DV.LEADING_PI,DV.LEADING_COH,DV.TRAILING_INTENSITY_LEVEL,DV.TRAILING_PI,DV.TRAILING_COH,DV.AVG_INTENSITY_LEVEL,DV.TRIAL,DV.GRIND,DV.COMMENTS
+FROM DISTRESS_OBSI_DATA DV 
+WHERE DV.DAY < '01-JAN-2010'
+MINUS 
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.FREQ_HZ,DV.ID,DV.OPERATOR,DV.TEST_TIRE,DV.LEADING_INTENSITY_LEVEL,DV.LEADING_PI,DV.LEADING_COH,DV.TRAILING_INTENSITY_LEVEL,DV.TRAILING_PI,DV.TRAILING_COH,DV.AVG_INTENSITY_LEVEL,DV.TRIAL,DV.GRIND,DV.COMMENTS
+FROM DISTRESS_OBSI_DATA DV JOIN DISTRESS D ON DV.ID=D.ID
+WHERE DV.DAY < '01-JAN-2010'
+)
+ORDER BY CELL,LANE,DAY,TIME,TRIAL,FREQ_HZ;
+
+--
+SELECT unique CELL,LANE,TO_CHAR(DAY,'yyyy-mm-dd') DAY FROM (
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.FREQ_HZ,DV.ID,DV.OPERATOR,DV.TEST_TIRE,DV.LEADING_INTENSITY_LEVEL,DV.LEADING_PI,DV.LEADING_COH,DV.TRAILING_INTENSITY_LEVEL,DV.TRAILING_PI,DV.TRAILING_COH,DV.AVG_INTENSITY_LEVEL,DV.TRIAL,DV.GRIND,DV.COMMENTS
+FROM DISTRESS_OBSI_DATA DV 
+WHERE DV.DAY < '01-JAN-2010'
+MINUS 
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.FREQ_HZ,DV.ID,DV.OPERATOR,DV.TEST_TIRE,DV.LEADING_INTENSITY_LEVEL,DV.LEADING_PI,DV.LEADING_COH,DV.TRAILING_INTENSITY_LEVEL,DV.TRAILING_PI,DV.TRAILING_COH,DV.AVG_INTENSITY_LEVEL,DV.TRIAL,DV.GRIND,DV.COMMENTS
+FROM DISTRESS_OBSI_DATA DV JOIN DISTRESS D ON DV.ID=D.ID
+WHERE DV.DAY < '01-JAN-2010'
+)
+ORDER BY CELL,LANE,DAY;
+
+
+SELECT unique CELL,TO_CHAR(DAY,'yyyy-mm-dd') DAY FROM (
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.FREQ_HZ,DV.ID,DV.OPERATOR,DV.TEST_TIRE,DV.LEADING_INTENSITY_LEVEL,DV.LEADING_PI,DV.LEADING_COH,DV.TRAILING_INTENSITY_LEVEL,DV.TRAILING_PI,DV.TRAILING_COH,DV.AVG_INTENSITY_LEVEL,DV.TRIAL,DV.GRIND,DV.COMMENTS
+FROM DISTRESS_OBSI_DATA DV 
+WHERE DV.DAY < '01-JAN-2010'
+MINUS 
+SELECT DV.CELL,DV.LANE,DV.DAY,DV.TIME,DV.FREQ_HZ,DV.ID,DV.OPERATOR,DV.TEST_TIRE,DV.LEADING_INTENSITY_LEVEL,DV.LEADING_PI,DV.LEADING_COH,DV.TRAILING_INTENSITY_LEVEL,DV.TRAILING_PI,DV.TRAILING_COH,DV.AVG_INTENSITY_LEVEL,DV.TRIAL,DV.GRIND,DV.COMMENTS
+FROM DISTRESS_OBSI_DATA DV JOIN DISTRESS D ON DV.ID=D.ID
+WHERE DV.DAY < '01-JAN-2010'
+)
+ORDER BY CELL,DAY;
+
+
+-- For cell 5 and 2008-11-20 yields 105,205,305,405
+SELECT CELL_OVER FROM (
+select (select cell_number from cell where id=under_cell_id) cell_over
+, under_cell_id id_over
+, (select from_date from cells where id=under_cell_id) over_from_date
+, (select to_date from cells where id=under_cell_id) over_to_date
+, (select cell_number from cell where id=over_cell_id) cell_under
+, over_cell_id id_under
+, (select from_date from cells where id=over_cell_id) under_from_date
+, (select to_date from cells where id=over_cell_id) under_to_date
+, us.FROM_STATION
+, us.TO_STATION
+from
+(SELECT unique cc2.cell_id under_cell_id, cc1.cell_id over_cell_id
+, case
+ when (select start_station from cell where id=cc2.cell_id) > (select start_station from cell where id=cc1.cell_id)
+ then (select start_station from cell where id=cc2.cell_id)
+ else (select start_station from cell where id=cc1.cell_id)
+ end
+ FROM_STATION
+, case
+ when (select end_station from cell where id=cc1.cell_id)<(select end_station from cell where id=cc2.cell_id)
+ then (select end_station from cell where id=cc1.cell_id)
+ when (select end_station from cell where id=cc2.cell_id)<(select start_station from cell where id=cc1.cell_id)
+ then (select start_station from cell where id=cc1.cell_id)
+ else (select end_station from cell where id=cc2.cell_id)
+ end
+ TO_STATION 
+FROM cell_cell cc1 join cell_cell cc2 on cc1.cell_id=cc2.cell_covered_by_id) us
+order by FROM_STATION
+) CD
+WHERE CD.CELL_UNDER=5 AND TO_DATE('2008-11-20','yyyy-mm-dd') BETWEEN CD.OVER_FROM_DATE AND CD.OVER_TO_DATE
+

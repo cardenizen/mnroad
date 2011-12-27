@@ -1,0 +1,70 @@
+TABLE_NAME (MNROAD_TABLE_NAME)
+
+*********************
+STRUCTURE (CELL/LANE)
+*********************
+Together, these tables describe the design of a roadway structure.
+CELL_ID
+Type (Concrete, Asphalt, Unpaved, and Composite)
+
+*********************
+PAVEMENT (LAYER)
+*********************
+Attributes of as-built or simulated pavement materials. The finished product placed in a layer at a construction/maintenance sites to meet performance needs (e.g. load capacity, smoothness, and drainage) of transport vehicles.
+The pavement product is the result of constituent material selection and various techniques/processes that manipulate, mix, transport, and place the pavement material at a construction site.
+LAYER_ID
+Type (Concrete, Asphalt, Aggregate)
+
+***************************
+PAVEMENT RECIPE
+***************************
+Specification of the techniques/processes used to produce a pavement material.
+ID
+Specification Number
+
+***************************
+PAVEMENT_CONSTITUENT (MATERIAL)
+***************************
+A component of a pavement material
+CONSTITUENT_ID
+Type (Soil, Cement, Bitumen, Aggregate, Admixture)
+Supplier
+
+***************************
+STRUCTURE_CORE
+***************************
+ID
+Location
+Date
+
+***************************
+CONSTITUENT_SAMPLE (MAT_SAMPLES)
+***************************
+Type (as-built, construction sample, vendor,...)
+Sample Source (CORE_ID/LAYER_ID, on-site, ...)
+ID
+
+***************************
+TEST_SUBJECT
+***************************
+All or part of a constituent sample used for a constituent test
+
+***************************
+CONSTITUENT_TEST (MAT_*_TEST)
+***************************
+Test Subject Source (CONSTITUENT_SAMPLE_ID, STRUCTURE_CORE_ID / CONSTITUENT_SAMPLE_ID
+Result (Name/Value Map)
+
+***************************
+STRUCTURE TEST
+***************************
+ID
+Date
+Location
+
+
+
+Some concepts and terminology from WSDOT (http://training.ce.washington.edu/wsdot/)
+
+
+

@@ -1,0 +1,16 @@
+<project name="gatherTcXv" default="gatherTcXv" basedir=".">
+	<target name="gatherTcXv">
+
+		<copy todir="raw_data" flatten="true" includeEmptyDirs="false">
+	    	<fileset dir="TC_Raw_Data">
+	    	</fileset>
+		</copy>
+    
+		<copy todir="raw_data" flatten="true" includeEmptyDirs="false">
+	    	<fileset dir="XV_Raw_Data">
+	    	</fileset>
+		</copy>
+
+	</target>
+	 	
+</project>

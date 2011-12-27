@@ -1,0 +1,36 @@
+*********************-- Development --****************************
+
+-- Development (MRL2K3dev.ad.dot.state.mn.us:1521:DEV11) Data Tablespace
+TABLESPACE MNR_DATA NOLOGGING 
+   PCTFREE 10
+   INITRANS 1
+   MAXTRANS 255
+  STORAGE ( 
+   INITIAL 65536
+   MINEXTENTS 1
+   MAXEXTENTS 2147483645
+ )
+   NOCACHE
+   
+-- Development (MRL2K3dev.ad.dot.state.mn.us:1521:DEV11) Index Tablespace  
+	USING INDEX
+	PCTFREE 0
+	TABLESPACE INDX 
+   
+*********************-- Production --****************************
+
+-- Production (MRL2K3MRDB.ad.dot.state.mn.us:1521:mnrd) Data Tablespace
+   TABLESPACE MDTB01 NOLOGGING 
+   PCTFREE 10
+   INITRANS 1
+   MAXTRANS 255
+  STORAGE ( 
+   INITIAL 65536
+   MINEXTENTS 1
+   MAXEXTENTS 2147483645
+ )
+   NOCACHE
+-- Production (MRL2K3MRDB.ad.dot.state.mn.us:1521:mnrd) Index Tablespace
+	USING INDEX
+	PCTFREE 0
+	TABLESPACE MDIX01   

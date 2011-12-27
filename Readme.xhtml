@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <title>Dependencies</title>
+</head>
+<body>In addition to plug-in dependencies (see application.properties) this code depends on:<br />
+<br />
+Java         JRE/JDK 1.6.x<br />
+Groovy    JDK 1.7.x<br />
+Grails       1.3.7<br />
+<br />
+Running<br />
+<br />
+Run the app in the development environment using development DB connection<br />
+grails run-app  -XX:PermSize=64m -XX:MaxPermSize=128m<br />
+<br />
+Run the app in the development environment using test jndi DB connection<br />
+grails test run-app -XX:PermSize=64m -XX:MaxPermSize=128m -Dpassword=DEV_PASSWORD<br />
+<br />
+Run Integration Tests<br />
+grails test test-app -XX:PermSize=64m -XX:MaxPermSize=128m -Dpassword=DEV_PASSWORD<br />
+<br />
+
+
+</body>
+</html>

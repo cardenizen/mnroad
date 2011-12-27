@@ -1,0 +1,9 @@
+sqlldr username/password@server control=loader.ctl
+
+loader.ctl
+----------
+load data
+ infile 'c:\data\mydata.csv'
+ into table emp
+ fields terminated by "," optionally enclosed by '"'		  
+ ( empno, empname, sal, deptno )

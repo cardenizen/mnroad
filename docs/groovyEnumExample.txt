@@ -1,0 +1,53 @@
+	public enum UserRole {
+	  SYSTEMS_ADMINISTRATOR('Systems administrator'),
+	  PROJECT_OWNER('Project owner'),
+	  PROJECT_MEMBER('Project member')
+	
+	  String name
+	
+	  UserRole(String name) {
+	    this.name = name
+	  }
+	
+	  static list() {
+	    [SYSTEMS_ADMINISTRATOR, PROJECT_OWNER, PROJECT_MEMBER]
+	  }
+	}
+
+/* Usage example - maps to a character DB column	
+From https://sites.google.com/a/pintailconsultingllc.com/groovy-and-grails/Home/gorm-and-domain-object-modeling/domain-object-modeling-with-groovy-enums
+Domain class:
+	
+	class User {                             	
+	                                        
+	  String firstName                      
+	  String lastName                       
+	  String username                       
+	  String password                       
+	  Boolean active = Boolean.FALSE        
+	  UserRole userRole                     
+	                                        
+	  // Automatically updated by GORM      
+	  Date dateCreated                      
+	                                        
+	  // Automatically updated by GORM      
+	  Date lastUpdated                      
+	                                        
+	  static constraints = {                
+	    firstName(blank: false)             
+	    lastName(blank: false)              
+	    username(blank: false, unique: true)
+	    password(blank: false)              
+	    active(nullable: false)             
+	    userRole(nullable: false)           
+	  }                                     
+	                                        
+	}                                       
+
+GSP:
+
+  <g:select name="userRole" id="userRole"                               	
+          from="${UserRole.list()}"                                    	
+          value="${fieldValue(bean: userInstance, field: 'userRole')}" */
+          optionValue="name"/>                                         
+                                                                                      

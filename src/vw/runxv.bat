@@ -1,0 +1,2 @@
+rem matlab -logfile matlab.log -r umn_data_analysis('TC','all','all','c:\temp\vw\in','c:\temp\vw\out');quit; -nosplash
+matlab -logfile C:\data\vwData\out\Cell5\matlabCell5.log -r umn_data_analysis('XV','all','all','C:\data\vwData\in','C:\data\vwData\out\Cell5',5);quit; -nosplash
